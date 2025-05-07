@@ -10,11 +10,15 @@ Created on 06/05/25 20.53
 Version 1.0
 */
 
+import com.krisnaajiep.todolistapi.mapper.UserRowMapper;
 import com.krisnaajiep.todolistapi.model.User;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -29,12 +33,27 @@ public class JdbcUserRepository extends AbstractJdbcRepository<User, Integer> {
 
     @Override
     public Optional<User> findById(Integer id) {
-        return Optional.empty();
+        String sql = "SELECT * FROM [User] WHERE ID = ?";
+        User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
+        return Optional.ofNullable(user);
     }
 
     @Override
     public User save(User user) {
-        return null;
+        String sql = "INSERT INTO [User] (Name, Email, Password) VALUES (?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(con -> {
+            var ps = con.prepareStatement(sql, new String[]{"ID"});
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPassword());
+            return ps;
+        }, keyHolder);
+
+        user.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
+
+        return findById(user.getId()).orElse(user);
     }
 
     @Override
