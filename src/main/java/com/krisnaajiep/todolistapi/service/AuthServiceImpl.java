@@ -12,27 +12,37 @@ Version 1.0
 
 import com.krisnaajiep.todolistapi.dto.LoginRequestDto;
 import com.krisnaajiep.todolistapi.dto.RegisterRequestDto;
+import com.krisnaajiep.todolistapi.mapper.RegisterUserMapper;
 import com.krisnaajiep.todolistapi.model.User;
 import com.krisnaajiep.todolistapi.repository.JdbcUserRepository;
+import com.krisnaajiep.todolistapi.security.BCrypt;
+import com.krisnaajiep.todolistapi.security.JwtUtil;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
     private final JdbcUserRepository jdbcUserRepository;
+    private final JwtUtil jwtUtil;
 
-    public AuthServiceImpl(JdbcUserRepository jdbcUserRepository) {
+    public AuthServiceImpl(JdbcUserRepository jdbcUserRepository, JwtUtil jwtUtil) {
         this.jdbcUserRepository = jdbcUserRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
-    public void register(RegisterRequestDto registerRequestDto) {
+    public String register(RegisterRequestDto registerRequestDto) {
+        String pwHash = BCrypt.hashpw(registerRequestDto.getPassword(), BCrypt.gensalt());
+        registerRequestDto.setPassword(pwHash);
 
+        User user = RegisterUserMapper.toUser(registerRequestDto);
+
+        user = jdbcUserRepository.save(user);
+
+        return jwtUtil.generateToken(user.getId().toString());
     }
 
     @Override
-    public Optional<User> login(LoginRequestDto loginRequestDto) {
-        return Optional.empty();
+    public String login(LoginRequestDto loginRequestDto) {
+        return null;
     }
 }
