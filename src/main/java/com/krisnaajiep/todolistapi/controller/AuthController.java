@@ -14,11 +14,14 @@ import com.krisnaajiep.todolistapi.dto.LoginRequestDto;
 import com.krisnaajiep.todolistapi.dto.RegisterRequestDto;
 import com.krisnaajiep.todolistapi.service.AuthService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 public class AuthController {
@@ -33,10 +36,13 @@ public class AuthController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Object> register(
+    public ResponseEntity<Map<String, String>> register(
             @Valid @RequestBody RegisterRequestDto registerRequestDto
     ) {
-        return null;
+        String token = authService.register(registerRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                Map.of("token", token)
+        );
     }
 
     @PostMapping(
