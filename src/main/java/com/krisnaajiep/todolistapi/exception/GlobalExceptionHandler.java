@@ -11,11 +11,13 @@ Version 1.0
 */
 
 import lombok.NonNull;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -38,23 +40,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 errors.put(error.getField(), error.getDefaultMessage())
         );
 
+
+
         return new ResponseEntity<>(Map.of("errors", errors), headers, status);
     }
 
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(
-            @NonNull HttpMessageNotReadableException ex,
-            @NonNull HttpHeaders headers,
-            @NonNull HttpStatusCode status,
-            @NonNull WebRequest request) {
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<Object> handleDuplicateKey(DuplicateKeyException ex) {
         String message = ex.getMostSpecificCause().getMessage();
 
-        if (message.contains("java.util.ArrayList")) {
-            errors.put("tags", "must be an array of strings");
-        } else {
-            errors.put("body", message);
+        if (message.contains("UQ__User__A9D105342EA5682C")) {
+            errors.put("email", "Email already exists");
         }
 
-        return new ResponseEntity<>(Map.of("errors", errors), headers, status);
+        return new ResponseEntity<>(Map.of("errors", errors), HttpStatus.CONFLICT);
     }
 }
