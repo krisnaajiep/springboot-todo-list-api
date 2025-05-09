@@ -10,6 +10,7 @@ Created on 06/05/25 21.00
 Version 1.0
 */
 
+import com.krisnaajiep.todolistapi.mapper.TaskRowMapper;
 import com.krisnaajiep.todolistapi.model.Task;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -28,7 +29,14 @@ public class JdbcTaskRepository extends AbstractJdbcRepository<Task, Integer> {
 
     @Override
     public Optional<Task> findById(Integer id) {
-        return Optional.empty();
+        String sql = "SELECT * FROM [Task] WHERE ID = ?";
+
+        try {
+            Task task = jdbcTemplate.queryForObject(sql, new TaskRowMapper(), id);
+            return Optional.ofNullable(task);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -51,7 +59,20 @@ public class JdbcTaskRepository extends AbstractJdbcRepository<Task, Integer> {
 
     @Override
     public Task update(Task task) {
-        return null;
+        String sql = "UPDATE [Task] SET Title = ?, Description = ? WHERE ID = ?";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(con -> {
+            var ps = con.prepareStatement(sql);
+            ps.setString(1, task.getTitle());
+            ps.setString(2, task.getDescription());
+            ps.setInt(3, task.getId());
+            return ps;
+        }, keyHolder);
+
+        task.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
+
+        return task;
     }
 
     @Override
