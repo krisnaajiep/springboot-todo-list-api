@@ -2,6 +2,7 @@ package com.krisnaajiep.todolistapi.service;
 
 import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
 import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
+import com.krisnaajiep.todolistapi.dto.TasksResponseDto;
 import com.krisnaajiep.todolistapi.model.Task;
 import com.krisnaajiep.todolistapi.repository.JdbcTaskRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -96,5 +98,17 @@ class TaskServiceImplTest {
 
     @Test
     void findAll() {
+        List<Task> tasks = List.of(task);
+        when(jdbcTaskRepository.findAll(anyInt(), anyInt(), anyInt())).thenReturn(tasks);
+
+        TasksResponseDto tasksResponseDto = taskServiceImpl.findAll(USER_ID, 1, 10);
+
+        assertNotNull(tasksResponseDto);
+        assertEquals(1, tasksResponseDto.getData().size());
+        assertEquals(task.getId(), tasksResponseDto.getData().getFirst().getId());
+        assertEquals(task.getTitle(), tasksResponseDto.getData().getFirst().getTitle());
+        assertEquals(task.getDescription(), tasksResponseDto.getData().getFirst().getDescription());
+
+        verify(jdbcTaskRepository, times(1)).findAll(anyInt(), anyInt(), anyInt());
     }
 }

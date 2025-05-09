@@ -12,10 +12,11 @@ Version 1.0
 
 import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
 import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
+import com.krisnaajiep.todolistapi.dto.TasksResponseDto;
 
 public interface TaskService {
     TaskResponseDto save(Integer userId, TaskRequestDto taskRequestDto);
     TaskResponseDto update(Integer userId, Integer id, TaskRequestDto taskRequestDto);
     void deleteById(Integer userId, Integer id);
-    Iterable<TaskResponseDto> findAll(Integer userId);
+    TasksResponseDto findAll(Integer userId, Integer page, Integer size);
 }
