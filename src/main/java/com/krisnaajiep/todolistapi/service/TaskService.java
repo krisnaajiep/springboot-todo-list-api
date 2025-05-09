@@ -11,11 +11,11 @@ Version 1.0
 */
 
 import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
-import com.krisnaajiep.todolistapi.model.Task;
+import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
 
 public interface TaskService {
-    Task save(TaskRequestDto taskRequestDto);
-    Task update(TaskRequestDto taskRequestDto);
-    void deleteById(Integer id);
-    Iterable<Task> findAll();
+    TaskResponseDto save(Integer userId, TaskRequestDto taskRequestDto);
+    TaskResponseDto update(Integer userId, TaskRequestDto taskRequestDto);
+    void deleteById(Integer userId, Integer id);
+    Iterable<TaskResponseDto> findAll(Integer userId);
 }
