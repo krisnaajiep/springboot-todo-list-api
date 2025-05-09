@@ -15,9 +15,10 @@ import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
 import com.krisnaajiep.todolistapi.model.Task;
 
 public class TaskMapper {
-    public static Task toTask(TaskRequestDto taskRequestDto) {
+    public static Task toTask(Integer userId, TaskRequestDto taskRequestDto) {
         Task task = new Task();
 
+        task.setUserId(userId);
         task.setTitle(taskRequestDto.getTitle());
         task.setDescription(taskRequestDto.getDescription());
 
