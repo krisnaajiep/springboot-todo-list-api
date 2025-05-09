@@ -12,8 +12,10 @@ Version 1.0
 
 import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
 import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
+import com.krisnaajiep.todolistapi.model.User;
 import com.krisnaajiep.todolistapi.service.TaskService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,9 +34,11 @@ public class TaskController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<TaskResponseDto> save(
+            User user,
             @Valid @RequestBody TaskRequestDto taskRequestDto
     ) {
-        return null;
+        TaskResponseDto taskResponseDto = taskService.save(user.getId(), taskRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(taskResponseDto);
     }
 
     @PutMapping(
