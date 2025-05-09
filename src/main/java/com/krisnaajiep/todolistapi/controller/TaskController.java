@@ -48,9 +48,11 @@ public class TaskController {
     )
     public ResponseEntity<TaskResponseDto> update(
             @PathVariable Integer id,
+            User user,
             @Valid @RequestBody TaskRequestDto taskRequestDto
     ) {
-        return null;
+        TaskResponseDto taskResponseDto = taskService.update(user.getId(), id, taskRequestDto);
+        return ResponseEntity.ok(taskResponseDto);
     }
 
     @DeleteMapping(path = "/{id}")
