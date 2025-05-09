@@ -22,6 +22,8 @@ public class TaskRequestDto {
     @Size(max = 255)
     private String title;
 
+    @NonNull
+    @NotBlank
     @Size(max = 500)
     private String description;
 }
