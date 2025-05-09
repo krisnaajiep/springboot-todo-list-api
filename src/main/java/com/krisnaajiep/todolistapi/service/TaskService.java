@@ -15,7 +15,7 @@ import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
 
 public interface TaskService {
     TaskResponseDto save(Integer userId, TaskRequestDto taskRequestDto);
-    TaskResponseDto update(Integer userId, TaskRequestDto taskRequestDto);
+    TaskResponseDto update(Integer userId, Integer id, TaskRequestDto taskRequestDto);
     void deleteById(Integer userId, Integer id);
     Iterable<TaskResponseDto> findAll(Integer userId);
 }

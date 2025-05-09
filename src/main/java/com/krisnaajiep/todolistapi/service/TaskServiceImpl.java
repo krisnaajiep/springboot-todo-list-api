@@ -12,6 +12,8 @@ Version 1.0
 
 import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
 import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
+import com.krisnaajiep.todolistapi.exception.ForbiddenException;
+import com.krisnaajiep.todolistapi.exception.TaskNotFoundException;
 import com.krisnaajiep.todolistapi.mapper.TaskMapper;
 import com.krisnaajiep.todolistapi.model.Task;
 import com.krisnaajiep.todolistapi.repository.JdbcTaskRepository;
@@ -33,8 +35,19 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponseDto update(Integer userId, TaskRequestDto taskRequestDto) {
-        return null;
+    public TaskResponseDto update(Integer userId, Integer id, TaskRequestDto taskRequestDto) {
+        Task task = jdbcTaskRepository
+                .findById(id)
+                .orElseThrow(TaskNotFoundException::new);
+
+        if (!task.getUserId().equals(userId)) {
+            throw new ForbiddenException();
+        }
+
+        task = TaskMapper.toTask(userId, taskRequestDto);
+        task = jdbcTaskRepository.save(task);
+
+        return TaskMapper.toTaskResponseDto(task);
     }
 
     @Override

@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -24,6 +26,7 @@ class TaskServiceImplTest {
     private TaskServiceImpl taskServiceImpl;
 
     private TaskRequestDto taskRequestDto;
+    private final static Integer TASK_ID = 1;
     private final static Integer USER_ID = 1;
     private Task task;
 
@@ -35,6 +38,7 @@ class TaskServiceImplTest {
         );
 
         task = new Task();
+        task.setId(TASK_ID);
         task.setUserId(USER_ID);
         task.setTitle(taskRequestDto.getTitle());
         task.setDescription(taskRequestDto.getDescription());
@@ -60,6 +64,23 @@ class TaskServiceImplTest {
 
     @Test
     void update() {
+        taskRequestDto.setTitle("Buy groceries");
+        taskRequestDto.setDescription("Buy milk, eggs, bread, apples");
+
+        task.setTitle(taskRequestDto.getTitle());
+        task.setDescription(taskRequestDto.getDescription());
+
+        when(jdbcTaskRepository.findById(anyInt())).thenReturn(Optional.of(task));
+        when(jdbcTaskRepository.save(any(Task.class))).thenReturn(task);
+
+        TaskResponseDto taskResponseDto = taskServiceImpl.update(USER_ID, TASK_ID, taskRequestDto);
+
+        assertNotNull(taskResponseDto);
+        assertEquals(task.getId(), taskResponseDto.getId());
+        assertEquals(task.getTitle(), taskResponseDto.getTitle());
+        assertEquals(task.getDescription(), taskResponseDto.getDescription());
+
+        verify(jdbcTaskRepository, times(1)).findById(anyInt());
     }
 
     @Test
