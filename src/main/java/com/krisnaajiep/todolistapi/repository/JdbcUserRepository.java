@@ -28,14 +28,26 @@ public class JdbcUserRepository extends AbstractJdbcRepository<User, Integer> {
     }
 
     public Optional<User> findByEmail(String email) {
-        return Optional.empty();
+        String sql = "SELECT * FROM [User] WHERE Email = ?";
+
+        try {
+            User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), email);
+            return Optional.ofNullable(user);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     @Override
     public Optional<User> findById(Integer id) {
         String sql = "SELECT * FROM [User] WHERE ID = ?";
-        User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
-        return Optional.ofNullable(user);
+
+        try {
+            User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
+            return Optional.ofNullable(user);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     @Override
