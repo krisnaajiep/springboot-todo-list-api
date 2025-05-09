@@ -11,6 +11,8 @@ Version 1.0
 */
 
 import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
+import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
+import com.krisnaajiep.todolistapi.mapper.TaskMapper;
 import com.krisnaajiep.todolistapi.model.Task;
 import com.krisnaajiep.todolistapi.repository.JdbcTaskRepository;
 import org.springframework.stereotype.Service;
@@ -24,22 +26,24 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task save(TaskRequestDto taskRequestDto) {
+    public TaskResponseDto save(Integer userId, TaskRequestDto taskRequestDto) {
+        Task task = TaskMapper.toTask(userId, taskRequestDto);
+        task = jdbcTaskRepository.save(task);
+        return TaskMapper.toTaskResponseDto(task);
+    }
+
+    @Override
+    public TaskResponseDto update(Integer userId, TaskRequestDto taskRequestDto) {
         return null;
     }
 
     @Override
-    public Task update(TaskRequestDto taskRequestDto) {
-        return null;
-    }
-
-    @Override
-    public void deleteById(Integer id) {
+    public void deleteById(Integer userId, Integer id) {
 
     }
 
     @Override
-    public Iterable<Task> findAll() {
+    public Iterable<TaskResponseDto> findAll(Integer userId) {
         return null;
     }
 }
