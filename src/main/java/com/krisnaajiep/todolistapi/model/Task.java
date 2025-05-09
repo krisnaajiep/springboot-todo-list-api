@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @Data
 public class Task {
     private Integer id;
+    private Integer userId;
     private String title;
     private String description;
     private LocalDateTime createdAt;
