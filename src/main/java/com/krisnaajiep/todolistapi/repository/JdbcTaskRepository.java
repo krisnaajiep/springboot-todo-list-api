@@ -77,7 +77,8 @@ public class JdbcTaskRepository extends AbstractJdbcRepository<Task, Integer> {
 
     @Override
     public void deleteById(Integer id) {
-
+        String sql = "DELETE FROM [Task] WHERE ID = ?";
+        jdbcTemplate.update(sql, id);
     }
 
     @Override
