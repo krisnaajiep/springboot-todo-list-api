@@ -56,8 +56,9 @@ public class TaskController {
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Integer id) {
-        return null;
+    public ResponseEntity<Void> deleteById(User user, @PathVariable Integer id) {
+        taskService.deleteById(user.getId(), id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
