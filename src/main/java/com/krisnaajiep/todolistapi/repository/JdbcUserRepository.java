@@ -74,7 +74,7 @@ public class JdbcUserRepository extends AbstractJdbcRepository<User, Integer> {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public void deleteById(Integer integer) {
 
     }
 

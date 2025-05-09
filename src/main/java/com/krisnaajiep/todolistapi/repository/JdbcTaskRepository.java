@@ -85,4 +85,9 @@ public class JdbcTaskRepository extends AbstractJdbcRepository<Task, Integer> {
     public List<Task> findAll() {
         return List.of();
     }
+
+    public List<Task> findAll(Integer userId, Integer start, Integer limit) {
+        String sql = "SELECT * FROM [Task] WHERE UserID = ? ORDER BY CreatedAt OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ";
+        return jdbcTemplate.query(sql, new TaskRowMapper(), userId, start, limit);
+    }
 }
