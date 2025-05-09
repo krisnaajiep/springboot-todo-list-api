@@ -28,6 +28,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private final Map<String, String> errors = new LinkedHashMap<>();
+    private final static String MESSAGE_KEY = "message";
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -59,9 +60,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(LoginException.class)
     public ResponseEntity<Object> handleLoginException(LoginException ex) {
-        errors.clear();
-        String message = ex.getMessage();
-        errors.put("message", message);
-        return new ResponseEntity<>(Map.of("errors", errors), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(
+                Map.of(MESSAGE_KEY, ex.getMessage()),
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<Object> handleTaskNotFoundException(TaskNotFoundException ex) {
+        return new ResponseEntity<>(
+                Map.of(MESSAGE_KEY, ex.getMessage()),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<Object> handleForbiddenException(ForbiddenException ex) {
+        return new ResponseEntity<>(
+                Map.of(MESSAGE_KEY, ex.getMessage()),
+                HttpStatus.FORBIDDEN
+        );
     }
 }
