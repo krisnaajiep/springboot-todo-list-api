@@ -53,6 +53,6 @@ public class AuthController {
     public ResponseEntity<Object> login(
             @Valid @RequestBody LoginRequestDto loginRequestDto
     ) {
-        return null;
+        return ResponseEntity.ok(Map.of("token", authService.login(loginRequestDto)));
     }
 }
