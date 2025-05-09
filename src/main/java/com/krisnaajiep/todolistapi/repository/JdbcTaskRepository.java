@@ -12,9 +12,12 @@ Version 1.0
 
 import com.krisnaajiep.todolistapi.model.Task;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -30,7 +33,20 @@ public class JdbcTaskRepository extends AbstractJdbcRepository<Task, Integer> {
 
     @Override
     public Task save(Task task) {
-        return null;
+        String sql = "INSERT INTO [Task] (UserID, Title, Description) VALUES (?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(con -> {
+            var ps = con.prepareStatement(sql, new String[]{"ID"});
+            ps.setInt(1, task.getUserId());
+            ps.setString(2, task.getTitle());
+            ps.setString(3, task.getDescription());
+            return ps;
+        }, keyHolder);
+
+        task.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
+
+        return task;
     }
 
     @Override
