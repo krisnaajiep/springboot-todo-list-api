@@ -36,17 +36,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             @NonNull HttpStatusCode status,
             @NonNull WebRequest request
     ) {
+        errors.clear();
+
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage())
         );
-
-
 
         return new ResponseEntity<>(Map.of("errors", errors), headers, status);
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<Object> handleDuplicateKey(DuplicateKeyException ex) {
+        errors.clear();
         String message = ex.getMostSpecificCause().getMessage();
 
         if (message.contains("UQ__User__A9D105342EA5682C")) {
@@ -54,5 +55,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         return new ResponseEntity<>(Map.of("errors", errors), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(LoginException.class)
+    public ResponseEntity<Object> handleLoginException(LoginException ex) {
+        errors.clear();
+        String message = ex.getMessage();
+        errors.put("message", message);
+        return new ResponseEntity<>(Map.of("errors", errors), HttpStatus.UNAUTHORIZED);
     }
 }
