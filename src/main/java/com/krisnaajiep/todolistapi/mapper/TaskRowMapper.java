@@ -22,6 +22,7 @@ public class TaskRowMapper implements RowMapper<Task> {
     public Task mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
         Task task = new Task();
         task.setId(rs.getInt("ID"));
+        task.setUserId(rs.getInt("UserID"));
         task.setTitle(rs.getString("Title"));
         task.setDescription(rs.getString("Description"));
         task.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
