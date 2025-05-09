@@ -63,10 +63,12 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                 User user = jdbcUserRepository.findById(userId).orElseThrow();
 
                 request.setAttribute("user", user);
+
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.getWriter().write("{\"message\": \"Unauthorized\"}");
+                return;
             }
         }
 
