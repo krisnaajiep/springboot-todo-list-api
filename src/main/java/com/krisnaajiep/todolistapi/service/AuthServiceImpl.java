@@ -12,6 +12,7 @@ Version 1.0
 
 import com.krisnaajiep.todolistapi.dto.LoginRequestDto;
 import com.krisnaajiep.todolistapi.dto.RegisterRequestDto;
+import com.krisnaajiep.todolistapi.exception.LoginException;
 import com.krisnaajiep.todolistapi.mapper.RegisterUserMapper;
 import com.krisnaajiep.todolistapi.model.User;
 import com.krisnaajiep.todolistapi.repository.JdbcUserRepository;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
     private final JdbcUserRepository jdbcUserRepository;
     private final JwtUtil jwtUtil;
+    private final static String LOGIN_ERROR_MESSAGE = "Invalid email or password";
 
     public AuthServiceImpl(JdbcUserRepository jdbcUserRepository, JwtUtil jwtUtil) {
         this.jdbcUserRepository = jdbcUserRepository;
@@ -43,6 +45,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String login(LoginRequestDto loginRequestDto) {
-        return null;
+        User user = jdbcUserRepository
+                .findByEmail(loginRequestDto.getEmail())
+                .orElseThrow(() -> new LoginException(LOGIN_ERROR_MESSAGE));
+
+        if (!BCrypt.checkpw(loginRequestDto.getPassword(), user.getPassword())) {
+            throw new LoginException(LOGIN_ERROR_MESSAGE);
+        }
+
+        return jwtUtil.generateToken(user.getId().toString());
     }
 }
