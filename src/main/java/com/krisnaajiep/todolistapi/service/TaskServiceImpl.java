@@ -52,7 +52,15 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void deleteById(Integer userId, Integer id) {
+        Task task = jdbcTaskRepository
+                .findById(id)
+                .orElseThrow(TaskNotFoundException::new);
 
+        if (!task.getUserId().equals(userId)) {
+            throw new ForbiddenException();
+        }
+
+        jdbcTaskRepository.deleteById(id);
     }
 
     @Override

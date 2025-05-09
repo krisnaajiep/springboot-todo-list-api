@@ -85,6 +85,13 @@ class TaskServiceImplTest {
 
     @Test
     void deleteById() {
+        when(jdbcTaskRepository.findById(anyInt())).thenReturn(Optional.of(task));
+        doNothing().when(jdbcTaskRepository).deleteById(anyInt());
+
+        taskServiceImpl.deleteById(USER_ID, TASK_ID);
+
+        verify(jdbcTaskRepository, times(1)).findById(anyInt());
+        verify(jdbcTaskRepository, times(1)).deleteById(anyInt());
     }
 
     @Test
