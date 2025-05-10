@@ -12,6 +12,7 @@ Version 1.0
 
 import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
 import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
+import com.krisnaajiep.todolistapi.dto.TasksRequestDto;
 import com.krisnaajiep.todolistapi.dto.TasksResponseDto;
 import com.krisnaajiep.todolistapi.model.User;
 import com.krisnaajiep.todolistapi.service.TaskService;
@@ -63,11 +64,7 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<TasksResponseDto> findAll(
-            User user,
-            @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
-            @RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit
-    ) {
-        return ResponseEntity.ok(taskService.findAll(user.getId(), page, limit));
+    public ResponseEntity<TasksResponseDto> findAll(User user, TasksRequestDto tasksRequestDto) {
+        return ResponseEntity.ok(taskService.findAll(user.getId(), tasksRequestDto));
     }
 }
