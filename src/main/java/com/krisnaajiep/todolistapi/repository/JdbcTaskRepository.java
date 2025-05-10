@@ -17,9 +17,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class JdbcTaskRepository extends AbstractJdbcRepository<Task, Integer> {
@@ -86,8 +84,36 @@ public class JdbcTaskRepository extends AbstractJdbcRepository<Task, Integer> {
         return List.of();
     }
 
-    public List<Task> findAll(Integer userId, Integer start, Integer limit) {
-        String sql = "SELECT * FROM [Task] WHERE UserID = ? ORDER BY CreatedAt OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ";
-        return jdbcTemplate.query(sql, new TaskRowMapper(), userId, start, limit);
+    public List<Task> findAll(
+            Integer userId,
+            String keyword,
+            String sortBy,
+            String sortDir,
+            Integer start,
+            Integer limit
+    ) {
+        StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM [Task] WHERE UserID = ? ");
+
+        List<Object> args = new ArrayList<>();
+        args.add(userId);
+
+        if (keyword != null && !keyword.isBlank()) {
+            sqlBuilder.append("AND (LOWER(Title) LIKE LOWER(CONCAT('%', ?, '%')) ")
+                    .append("OR LOWER(Description) LIKE LOWER(CONCAT('%', ?, '%'))) ");
+
+            args.add(keyword);
+            args.add(keyword);
+        }
+
+        sqlBuilder.append("ORDER BY ")
+                .append(sortBy)
+                .append(" ")
+                .append(sortDir)
+                .append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ");
+
+        args.add(start);
+        args.add(limit);
+
+        return jdbcTemplate.query(sqlBuilder.toString(), new TaskRowMapper(), args.toArray());
     }
 }
