@@ -12,6 +12,7 @@ Version 1.0
 
 import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
 import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
+import com.krisnaajiep.todolistapi.dto.TasksRequestDto;
 import com.krisnaajiep.todolistapi.dto.TasksResponseDto;
 import com.krisnaajiep.todolistapi.exception.ForbiddenException;
 import com.krisnaajiep.todolistapi.exception.TaskNotFoundException;
@@ -67,13 +68,34 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TasksResponseDto findAll(Integer userId, Integer page, Integer limit) {
+    public TasksResponseDto findAll(Integer userId, TasksRequestDto tasksRequestDto) {
+        String keyword = tasksRequestDto.getKeyword();
+
+        String sortBy;
+        switch (tasksRequestDto.getSortBy()) {
+            case TITLE -> sortBy = "Title";
+            case UPDATED_AT -> sortBy = "UpdatedAt";
+            default -> sortBy = "CreatedAt";
+        }
+
+        System.out.printf("sortBy: %s", sortBy);
+
+        String sortDir = String.valueOf(tasksRequestDto.getSortDir());
+
+        Integer page = tasksRequestDto.getPage();
+        Integer limit = tasksRequestDto.getLimit();
+
         Integer start = page > 1 ? (page - 1) * limit : 0;
-        List<Task> tasks = jdbcTaskRepository.findAll(userId, start, limit);
+        List<Task> tasks = jdbcTaskRepository.findAll(userId, keyword, sortBy, sortDir, start, limit);
 
         List<TaskResponseDto> taskResponseDtoList = tasks.stream().map(TaskMapper::toTaskResponseDto).toList();
         int total = taskResponseDtoList.size();
 
-        return new TasksResponseDto(taskResponseDtoList, page, limit, total);
+        return new TasksResponseDto(
+                taskResponseDtoList,
+                page,
+                limit,
+                total
+        );
     }
 }

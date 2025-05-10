@@ -2,6 +2,7 @@ package com.krisnaajiep.todolistapi.service;
 
 import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
 import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
+import com.krisnaajiep.todolistapi.dto.TasksRequestDto;
 import com.krisnaajiep.todolistapi.dto.TasksResponseDto;
 import com.krisnaajiep.todolistapi.model.Task;
 import com.krisnaajiep.todolistapi.repository.JdbcTaskRepository;
@@ -99,9 +100,16 @@ class TaskServiceImplTest {
     @Test
     void findAll() {
         List<Task> tasks = List.of(task);
-        when(jdbcTaskRepository.findAll(anyInt(), anyInt(), anyInt())).thenReturn(tasks);
 
-        TasksResponseDto tasksResponseDto = taskServiceImpl.findAll(USER_ID, 1, 10);
+        TasksRequestDto tasksRequestDto = new TasksRequestDto();
+        tasksRequestDto.setKeyword("");
+        tasksRequestDto.setPage(1);
+        tasksRequestDto.setLimit(10);
+
+        when(jdbcTaskRepository.findAll(anyInt(), anyString(), anyString(), anyString(), anyInt(), anyInt()))
+                .thenReturn(tasks);
+
+        TasksResponseDto tasksResponseDto = taskServiceImpl.findAll(USER_ID, tasksRequestDto);
 
         assertNotNull(tasksResponseDto);
         assertEquals(1, tasksResponseDto.getData().size());
@@ -109,6 +117,7 @@ class TaskServiceImplTest {
         assertEquals(task.getTitle(), tasksResponseDto.getData().getFirst().getTitle());
         assertEquals(task.getDescription(), tasksResponseDto.getData().getFirst().getDescription());
 
-        verify(jdbcTaskRepository, times(1)).findAll(anyInt(), anyInt(), anyInt());
+        verify(jdbcTaskRepository, times(1))
+                .findAll(anyInt(), anyString(), anyString(), anyString(), anyInt(), anyInt());
     }
 }
