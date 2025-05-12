@@ -49,7 +49,8 @@ public class TaskServiceImpl implements TaskService {
         }
 
         task = TaskMapper.toTask(userId, taskRequestDto);
-        task = jdbcTaskRepository.save(task);
+        task.setId(id);
+        task = jdbcTaskRepository.update(task);
 
         return TaskMapper.toTaskResponseDto(task);
     }

@@ -58,19 +58,10 @@ public class JdbcTaskRepository extends AbstractJdbcRepository<Task, Integer> {
     @Override
     public Task update(Task task) {
         String sql = "UPDATE [Task] SET Title = ?, Description = ? WHERE ID = ?";
-        KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update(con -> {
-            var ps = con.prepareStatement(sql);
-            ps.setString(1, task.getTitle());
-            ps.setString(2, task.getDescription());
-            ps.setInt(3, task.getId());
-            return ps;
-        }, keyHolder);
+        jdbcTemplate.update(sql, task.getTitle(), task.getDescription(), task.getId());
 
-        task.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
-
-        return task;
+        return findById(task.getId()).orElse(task);
     }
 
     @Override
