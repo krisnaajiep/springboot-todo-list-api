@@ -1,4 +1,4 @@
-package com.krisnaajiep.todolistapi.exception;
+package com.krisnaajiep.todolistapi.handler;
 
 /*
 IntelliJ IDEA 2025.1 (Ultimate Edition)
@@ -10,6 +10,9 @@ Created on 06/05/25 00.16
 Version 1.0
 */
 
+import com.krisnaajiep.todolistapi.exception.ForbiddenException;
+import com.krisnaajiep.todolistapi.exception.LoginException;
+import com.krisnaajiep.todolistapi.exception.TaskNotFoundException;
 import lombok.NonNull;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
@@ -22,12 +25,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-    private final Map<String, String> errors = new LinkedHashMap<>();
     private final static String MESSAGE_KEY = "message";
 
     @Override
@@ -37,7 +39,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             @NonNull HttpStatusCode status,
             @NonNull WebRequest request
     ) {
-        errors.clear();
+        Map<String, String> errors = new HashMap<>();
 
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage())
@@ -48,14 +50,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<Object> handleDuplicateKey(DuplicateKeyException ex) {
-        errors.clear();
         String message = ex.getMostSpecificCause().getMessage();
 
         if (message.contains("UQ__User__A9D105342EA5682C")) {
-            errors.put("email", "Email already exists");
+            message = "Email already exists";
         }
 
-        return new ResponseEntity<>(Map.of("errors", errors), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(Map.of(MESSAGE_KEY, message), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(LoginException.class)
