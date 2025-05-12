@@ -11,8 +11,8 @@ Version 1.0
 */
 
 import com.krisnaajiep.todolistapi.exception.ForbiddenException;
-import com.krisnaajiep.todolistapi.exception.LoginException;
 import com.krisnaajiep.todolistapi.exception.TaskNotFoundException;
+import com.krisnaajiep.todolistapi.exception.UnauthorizedException;
 import lombok.NonNull;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
@@ -59,8 +59,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(Map.of(MESSAGE_KEY, message), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(LoginException.class)
-    public ResponseEntity<Object> handleLoginException(LoginException ex) {
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Object> handleLoginException(UnauthorizedException ex) {
         return new ResponseEntity<>(
                 Map.of(MESSAGE_KEY, ex.getMessage()),
                 HttpStatus.UNAUTHORIZED

@@ -10,8 +10,8 @@ Created on 09/05/25 08.14
 Version 1.0
 */
 
-public class LoginException extends RuntimeException {
-    public LoginException(String message) {
+public class UnauthorizedException extends RuntimeException {
+    public UnauthorizedException(String message) {
         super(message);
     }
 }
