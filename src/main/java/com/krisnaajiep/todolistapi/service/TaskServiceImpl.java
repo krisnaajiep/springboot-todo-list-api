@@ -78,8 +78,6 @@ public class TaskServiceImpl implements TaskService {
             default -> sortBy = "CreatedAt";
         }
 
-        System.out.printf("sortBy: %s", sortBy);
-
         String sortDir = String.valueOf(tasksRequestDto.getSortDir());
 
         Integer page = tasksRequestDto.getPage();
