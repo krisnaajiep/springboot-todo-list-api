@@ -2,12 +2,13 @@ package com.krisnaajiep.todolistapi.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
-import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
-import com.krisnaajiep.todolistapi.dto.TasksRequestDto;
-import com.krisnaajiep.todolistapi.dto.TasksResponseDto;
+import com.krisnaajiep.todolistapi.dto.request.TaskRequestDto;
+import com.krisnaajiep.todolistapi.dto.response.TaskResponseDto;
+import com.krisnaajiep.todolistapi.dto.request.TasksRequestDto;
+import com.krisnaajiep.todolistapi.dto.response.TasksResponseDto;
 import com.krisnaajiep.todolistapi.exception.ForbiddenException;
 import com.krisnaajiep.todolistapi.exception.TaskNotFoundException;
+import com.krisnaajiep.todolistapi.filter.AuthorizationFilter;
 import com.krisnaajiep.todolistapi.model.Task;
 import com.krisnaajiep.todolistapi.model.User;
 import com.krisnaajiep.todolistapi.repository.JdbcUserRepository;
@@ -18,6 +19,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -72,6 +76,21 @@ class TaskControllerTest {
     private final static String PASSWORD = "password";
 
     private static final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
+    private static final String TOKEN_PURPOSE = "access";
+
+    @TestConfiguration
+    static class FilterConfig {
+        @Bean
+        public FilterRegistrationBean<AuthorizationFilter> authorizationFilter(
+                JdbcUserRepository jdbcUserRepository,
+                JwtUtil jwtUtil
+        ) {
+            FilterRegistrationBean<AuthorizationFilter> registrationBean = new FilterRegistrationBean<>();
+            registrationBean.setFilter(new AuthorizationFilter(jdbcUserRepository, jwtUtil));
+            registrationBean.addUrlPatterns("/todos/*");
+            return registrationBean;
+        }
+    }
 
     @BeforeEach
     void setUp() {
@@ -121,6 +140,7 @@ class TaskControllerTest {
 
     @Test
     void saveSuccess() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
         when(jdbcUserRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -155,6 +175,7 @@ class TaskControllerTest {
 
     @Test
     void saveInvalid() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
         when(jdbcUserRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -188,6 +209,7 @@ class TaskControllerTest {
 
     @Test
     void saveUnauthorized() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
 //        when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(true);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
@@ -222,6 +244,7 @@ class TaskControllerTest {
 
     @Test
     void updateSuccess() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
         when(jdbcUserRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -256,6 +279,7 @@ class TaskControllerTest {
 
     @Test
     void updateInvalid() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
         when(jdbcUserRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -289,6 +313,7 @@ class TaskControllerTest {
 
     @Test
     void updateUnauthorized() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
 //        when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(true);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
@@ -323,6 +348,7 @@ class TaskControllerTest {
 
     @Test
     void updateNotFound() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
         when(jdbcUserRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -357,6 +383,7 @@ class TaskControllerTest {
 
     @Test
     void updateForbidden() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
         when(jdbcUserRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -391,6 +418,7 @@ class TaskControllerTest {
 
     @Test
     void deleteByIdSuccess() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
         when(jdbcUserRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -415,6 +443,7 @@ class TaskControllerTest {
 
     @Test
     void deleteByIdUnauthorized() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
 //        when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(true);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
@@ -445,6 +474,7 @@ class TaskControllerTest {
 
     @Test
     void deleteByIdNotFound() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
         when(jdbcUserRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -475,6 +505,7 @@ class TaskControllerTest {
 
     @Test
     void deleteByIdForbidden() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
         when(jdbcUserRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -505,6 +536,7 @@ class TaskControllerTest {
 
     @Test
     void findAllSuccess() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
         when(jdbcUserRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -541,6 +573,7 @@ class TaskControllerTest {
 
     @Test
     void findAllUnauthorized() throws Exception {
+        when(jwtUtil.extractPurpose(anyString())).thenReturn(TOKEN_PURPOSE);
 //        when(jwtUtil.isTokenExpired(anyString())).thenReturn(false);
         when(jwtUtil.isTokenExpired(anyString())).thenReturn(true);
         when(jwtUtil.extractSubject(anyString())).thenReturn(String.valueOf(USER_ID));
