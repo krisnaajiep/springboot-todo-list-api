@@ -10,7 +10,7 @@ Created on 06/05/25 21.09
 Version 1.0
 */
 
-import com.krisnaajiep.todolistapi.dto.RegisterRequestDto;
+import com.krisnaajiep.todolistapi.dto.request.RegisterRequestDto;
 import com.krisnaajiep.todolistapi.model.User;
 
 public class RegisterUserMapper {

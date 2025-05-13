@@ -10,8 +10,8 @@ Created on 06/05/25 21.20
 Version 1.0
 */
 
-import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
-import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
+import com.krisnaajiep.todolistapi.dto.request.TaskRequestDto;
+import com.krisnaajiep.todolistapi.dto.response.TaskResponseDto;
 import com.krisnaajiep.todolistapi.model.Task;
 
 public class TaskMapper {
