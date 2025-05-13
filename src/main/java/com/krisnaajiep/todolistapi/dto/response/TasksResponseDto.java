@@ -1,4 +1,4 @@
-package com.krisnaajiep.todolistapi.dto;
+package com.krisnaajiep.todolistapi.dto.response;
 
 /*
 IntelliJ IDEA 2025.1 (Ultimate Edition)
