@@ -1,9 +1,9 @@
 package com.krisnaajiep.todolistapi.service;
 
-import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
-import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
-import com.krisnaajiep.todolistapi.dto.TasksRequestDto;
-import com.krisnaajiep.todolistapi.dto.TasksResponseDto;
+import com.krisnaajiep.todolistapi.dto.request.TaskRequestDto;
+import com.krisnaajiep.todolistapi.dto.response.TaskResponseDto;
+import com.krisnaajiep.todolistapi.dto.request.TasksRequestDto;
+import com.krisnaajiep.todolistapi.dto.response.TasksResponseDto;
 import com.krisnaajiep.todolistapi.model.Task;
 import com.krisnaajiep.todolistapi.repository.JdbcTaskRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -74,7 +74,7 @@ class TaskServiceImplTest {
         task.setDescription(taskRequestDto.getDescription());
 
         when(jdbcTaskRepository.findById(anyInt())).thenReturn(Optional.of(task));
-        when(jdbcTaskRepository.save(any(Task.class))).thenReturn(task);
+        when(jdbcTaskRepository.update(any(Task.class))).thenReturn(task);
 
         TaskResponseDto taskResponseDto = taskServiceImpl.update(USER_ID, TASK_ID, taskRequestDto);
 
@@ -84,6 +84,7 @@ class TaskServiceImplTest {
         assertEquals(task.getDescription(), taskResponseDto.getDescription());
 
         verify(jdbcTaskRepository, times(1)).findById(anyInt());
+        verify(jdbcTaskRepository, times(1)).update(any(Task.class));
     }
 
     @Test

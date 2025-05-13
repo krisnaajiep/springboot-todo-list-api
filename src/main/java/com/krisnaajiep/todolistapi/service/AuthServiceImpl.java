@@ -10,15 +10,18 @@ Created on 06/05/25 21.41
 Version 1.0
 */
 
-import com.krisnaajiep.todolistapi.dto.LoginRequestDto;
-import com.krisnaajiep.todolistapi.dto.RegisterRequestDto;
-import com.krisnaajiep.todolistapi.exception.LoginException;
+import com.krisnaajiep.todolistapi.dto.request.LoginRequestDto;
+import com.krisnaajiep.todolistapi.dto.request.RegisterRequestDto;
+import com.krisnaajiep.todolistapi.dto.response.TokenResponseDto;
+import com.krisnaajiep.todolistapi.exception.UnauthorizedException;
 import com.krisnaajiep.todolistapi.mapper.RegisterUserMapper;
 import com.krisnaajiep.todolistapi.model.User;
 import com.krisnaajiep.todolistapi.repository.JdbcUserRepository;
 import com.krisnaajiep.todolistapi.security.BCrypt;
 import com.krisnaajiep.todolistapi.security.JwtUtil;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -32,7 +35,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String register(RegisterRequestDto registerRequestDto) {
+    public TokenResponseDto register(RegisterRequestDto registerRequestDto) {
         String pwHash = BCrypt.hashpw(registerRequestDto.getPassword(), BCrypt.gensalt());
         registerRequestDto.setPassword(pwHash);
 
@@ -40,19 +43,50 @@ public class AuthServiceImpl implements AuthService {
 
         user = jdbcUserRepository.save(user);
 
-        return jwtUtil.generateToken(user.getId().toString());
+        String familyId = UUID.randomUUID().toString();
+
+        String accessToken = jwtUtil.generateToken(user.getId().toString(), "access", familyId);
+        String refreshToken = jwtUtil.generateToken(user.getId().toString(), "refresh", familyId);
+
+        return new TokenResponseDto(accessToken, refreshToken);
     }
 
     @Override
-    public String login(LoginRequestDto loginRequestDto) {
+    public TokenResponseDto login(LoginRequestDto loginRequestDto) {
         User user = jdbcUserRepository
                 .findByEmail(loginRequestDto.getEmail())
-                .orElseThrow(() -> new LoginException(LOGIN_ERROR_MESSAGE));
+                .orElseThrow(() -> new UnauthorizedException(LOGIN_ERROR_MESSAGE));
 
         if (!BCrypt.checkpw(loginRequestDto.getPassword(), user.getPassword())) {
-            throw new LoginException(LOGIN_ERROR_MESSAGE);
+            throw new UnauthorizedException(LOGIN_ERROR_MESSAGE);
         }
 
-        return jwtUtil.generateToken(user.getId().toString());
+        String familyId = UUID.randomUUID().toString();
+
+        String accessToken = jwtUtil.generateToken(user.getId().toString(), "access", familyId);
+        String refreshToken = jwtUtil.generateToken(user.getId().toString(), "refresh", familyId);
+
+        return new TokenResponseDto(accessToken, refreshToken);
+    }
+
+    @Override
+    public String refreshToken(String bearerToken, String refreshToken) {
+        try {
+            if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+                throw new UnauthorizedException("Unauthorized");
+            }
+
+            String accessToken = bearerToken.substring(7);
+
+            if (jwtUtil.isTokenExpired(refreshToken) || !jwtUtil.isTokenPairValid(accessToken, refreshToken)) {
+                throw new UnauthorizedException("Unauthorized");
+            }
+
+            String subject = jwtUtil.extractSubject(refreshToken);
+
+            return jwtUtil.generateToken(subject, "access", jwtUtil.extractFamilyId(refreshToken));
+        } catch (Exception e) {
+            throw new UnauthorizedException(e.getMessage());
+        }
     }
 }

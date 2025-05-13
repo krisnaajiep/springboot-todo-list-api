@@ -10,10 +10,12 @@ Created on 06/05/25 21.25
 Version 1.0
 */
 
-import com.krisnaajiep.todolistapi.dto.LoginRequestDto;
-import com.krisnaajiep.todolistapi.dto.RegisterRequestDto;
+import com.krisnaajiep.todolistapi.dto.request.LoginRequestDto;
+import com.krisnaajiep.todolistapi.dto.request.RegisterRequestDto;
+import com.krisnaajiep.todolistapi.dto.response.TokenResponseDto;
 
 public interface AuthService {
-    String register(RegisterRequestDto registerRequestDto);
-    String login(LoginRequestDto loginRequestDto);
+    TokenResponseDto register(RegisterRequestDto registerRequestDto);
+    TokenResponseDto login(LoginRequestDto loginRequestDto);
+    String refreshToken(String bearerToken, String refreshToken);
 }

@@ -1,7 +1,8 @@
 package com.krisnaajiep.todolistapi.service;
 
-import com.krisnaajiep.todolistapi.dto.LoginRequestDto;
-import com.krisnaajiep.todolistapi.dto.RegisterRequestDto;
+import com.krisnaajiep.todolistapi.dto.request.LoginRequestDto;
+import com.krisnaajiep.todolistapi.dto.request.RegisterRequestDto;
+import com.krisnaajiep.todolistapi.dto.response.TokenResponseDto;
 import com.krisnaajiep.todolistapi.model.User;
 import com.krisnaajiep.todolistapi.repository.JdbcUserRepository;
 import com.krisnaajiep.todolistapi.security.BCrypt;
@@ -32,6 +33,8 @@ class AuthServiceImplTest {
     private AuthServiceImpl authServiceImpl;
 
     private User user;
+    private static final String ACCESS_PURPOSE = "access";
+    private static final String REFRESH_PURPOSE = "refresh";
 
     @BeforeEach
     void setUp() {
@@ -58,17 +61,19 @@ class AuthServiceImplTest {
         user.setPassword(BCrypt.hashpw(registerRequestDto.getPassword(), BCrypt.gensalt()));
 
         when(jdbcUserRepository.save(any(User.class))).thenReturn(user);
-        when(jwtUtil.generateToken(anyString())).thenReturn("token");
+        when(jwtUtil.generateToken(anyString(), eq(ACCESS_PURPOSE), anyString())).thenReturn("accessToken");
+        when(jwtUtil.generateToken(anyString(), eq(REFRESH_PURPOSE), anyString())).thenReturn("refreshToken");
 
-        String token = authServiceImpl.register(registerRequestDto);
+        TokenResponseDto tokenResponseDto = authServiceImpl.register(registerRequestDto);
 
-        System.out.printf("Token: %s", token);
+        System.out.printf("Token: %s", tokenResponseDto);
 
-        assertNotNull(token);
-        assertEquals("token", token);
+        assertNotNull(tokenResponseDto);
+        assertEquals("accessToken", tokenResponseDto.getAccessToken());
+        assertEquals("refreshToken", tokenResponseDto.getRefreshToken());
 
         verify(jdbcUserRepository, times(1)).save(any(User.class));
-        verify(jwtUtil, times(1)).generateToken(anyString());
+        verify(jwtUtil, times(2)).generateToken(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -83,16 +88,18 @@ class AuthServiceImplTest {
         user.setPassword(BCrypt.hashpw(loginRequestDto.getPassword(), BCrypt.gensalt()));
 
         when(jdbcUserRepository.findByEmail(loginRequestDto.getEmail())).thenReturn(Optional.of(user));
-        when(jwtUtil.generateToken(anyString())).thenReturn("token");
+        when(jwtUtil.generateToken(anyString(), eq(ACCESS_PURPOSE), anyString())).thenReturn("accessToken");
+        when(jwtUtil.generateToken(anyString(), eq(REFRESH_PURPOSE), anyString())).thenReturn("refreshToken");
 
-        String token = authServiceImpl.login(loginRequestDto);
+        TokenResponseDto tokenResponseDto = authServiceImpl.login(loginRequestDto);
 
-        System.out.printf("Token: %s", token);
+        System.out.printf("Token: %s", tokenResponseDto);
 
-        assertNotNull(token);
-        assertEquals("token", token);
+        assertNotNull(tokenResponseDto);
+        assertEquals("accessToken", tokenResponseDto.getAccessToken());
+        assertEquals("refreshToken", tokenResponseDto.getRefreshToken());
 
         verify(jdbcUserRepository, times(1)).findByEmail(loginRequestDto.getEmail());
-        verify(jwtUtil, times(1)).generateToken(anyString());
+        verify(jwtUtil, times(2)).generateToken(anyString(), anyString(), anyString());
     }
 }

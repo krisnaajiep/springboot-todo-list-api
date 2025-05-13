@@ -10,10 +10,10 @@ Created on 06/05/25 21.33
 Version 1.0
 */
 
-import com.krisnaajiep.todolistapi.dto.TaskRequestDto;
-import com.krisnaajiep.todolistapi.dto.TaskResponseDto;
-import com.krisnaajiep.todolistapi.dto.TasksRequestDto;
-import com.krisnaajiep.todolistapi.dto.TasksResponseDto;
+import com.krisnaajiep.todolistapi.dto.request.TaskRequestDto;
+import com.krisnaajiep.todolistapi.dto.response.TaskResponseDto;
+import com.krisnaajiep.todolistapi.dto.request.TasksRequestDto;
+import com.krisnaajiep.todolistapi.dto.response.TasksResponseDto;
 
 public interface TaskService {
     TaskResponseDto save(Integer userId, TaskRequestDto taskRequestDto);
