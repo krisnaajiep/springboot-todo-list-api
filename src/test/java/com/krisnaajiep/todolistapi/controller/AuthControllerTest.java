@@ -2,9 +2,10 @@ package com.krisnaajiep.todolistapi.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.krisnaajiep.todolistapi.dto.LoginRequestDto;
-import com.krisnaajiep.todolistapi.dto.RegisterRequestDto;
-import com.krisnaajiep.todolistapi.exception.LoginException;
+import com.krisnaajiep.todolistapi.dto.request.LoginRequestDto;
+import com.krisnaajiep.todolistapi.dto.request.RegisterRequestDto;
+import com.krisnaajiep.todolistapi.dto.response.TokenResponseDto;
+import com.krisnaajiep.todolistapi.exception.UnauthorizedException;
 import com.krisnaajiep.todolistapi.repository.JdbcUserRepository;
 import com.krisnaajiep.todolistapi.security.JwtUtil;
 import com.krisnaajiep.todolistapi.service.AuthService;
@@ -20,7 +21,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,10 +47,17 @@ class AuthControllerTest {
 
     private RegisterRequestDto registerRequestDto;
     private LoginRequestDto loginRequestDto;
-    private static final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
+    private static final String ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9_access";
+    private static final String REFRESH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9_refresh";
+
+    private TokenResponseDto tokenResponseDto;
 
     @BeforeEach
     void setUp() {
+        tokenResponseDto = new TokenResponseDto(
+                ACCESS_TOKEN,
+                REFRESH_TOKEN
+        );
     }
 
     @AfterEach
@@ -63,7 +72,7 @@ class AuthControllerTest {
                 "password"
         );
 
-        when(authService.register(registerRequestDto)).thenReturn(TOKEN);
+        when(authService.register(registerRequestDto)).thenReturn(tokenResponseDto);
 
         mockMvc.perform(
                 post("/register")
@@ -73,15 +82,17 @@ class AuthControllerTest {
         ).andExpectAll(
                 status().isCreated()
         ).andDo(result -> {
-                    Map<String, String> response = objectMapper.readValue(
+                    TokenResponseDto response = objectMapper.readValue(
                             result.getResponse().getContentAsString(),
-                            new TypeReference<>() {}
+                            new TypeReference<>() {
+                            }
                     );
 
-                    System.out.println(response);
-
-                    assertNotNull(response.get("token"));
-                    assertEquals(TOKEN, response.get("token"));
+                    assertNotNull(response);
+                    assertNotNull(response.getAccessToken());
+                    assertNotNull(response.getRefreshToken());
+                    assertEquals(tokenResponseDto.getAccessToken(), response.getAccessToken());
+                    assertEquals(tokenResponseDto.getRefreshToken(), response.getRefreshToken());
 
                     verify(authService, times(1)).register(registerRequestDto);
                 }
@@ -96,7 +107,7 @@ class AuthControllerTest {
                 "password"
         );
 
-        when(authService.register(registerRequestDto)).thenReturn(TOKEN);
+        when(authService.register(registerRequestDto)).thenReturn(tokenResponseDto);
 
         mockMvc.perform(
                 post("/register")
@@ -108,7 +119,8 @@ class AuthControllerTest {
         ).andDo(result -> {
                     Map<String, Map<String, String>> response = objectMapper.readValue(
                             result.getResponse().getContentAsString(),
-                            new TypeReference<>() {}
+                            new TypeReference<>() {
+                            }
                     );
 
                     System.out.println(response);
@@ -129,7 +141,7 @@ class AuthControllerTest {
                 "password"
         );
 
-        when(authService.login(loginRequestDto)).thenReturn(TOKEN);
+        when(authService.login(loginRequestDto)).thenReturn(tokenResponseDto);
 
         mockMvc.perform(
                 post("/login")
@@ -139,17 +151,19 @@ class AuthControllerTest {
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
-                    Map<String, String> response = objectMapper.readValue(
-                            result.getResponse().getContentAsString(),
-                            new TypeReference<>() {}
-                    );
+            TokenResponseDto response = objectMapper.readValue(
+                    result.getResponse().getContentAsString(),
+                    new TypeReference<>() {
+                    }
+            );
 
-                    System.out.println(response);
+            assertNotNull(response);
+            assertNotNull(response.getAccessToken());
+            assertNotNull(response.getRefreshToken());
+            assertEquals(tokenResponseDto.getAccessToken(), response.getAccessToken());
+            assertEquals(tokenResponseDto.getRefreshToken(), response.getRefreshToken());
 
-                    assertNotNull(response.get("token"));
-                    assertEquals(TOKEN, response.get("token"));
-
-                    verify(authService, times(1)).login(loginRequestDto);
+            verify(authService, times(1)).login(loginRequestDto);
         });
     }
 
@@ -160,7 +174,7 @@ class AuthControllerTest {
                 ""
         );
 
-        when(authService.login(loginRequestDto)).thenReturn(TOKEN);
+        when(authService.login(loginRequestDto)).thenReturn(tokenResponseDto);
 
         mockMvc.perform(
                 post("/login")
@@ -172,7 +186,8 @@ class AuthControllerTest {
         ).andDo(result -> {
             Map<String, Map<String, String>> response = objectMapper.readValue(
                     result.getResponse().getContentAsString(),
-                    new TypeReference<>() {}
+                    new TypeReference<>() {
+                    }
             );
 
             System.out.println(response);
@@ -195,7 +210,7 @@ class AuthControllerTest {
         String message = "Invalid email or password";
 
         when(authService.login(loginRequestDto)).thenThrow(
-                new LoginException(message)
+                new UnauthorizedException(message)
         );
 
         mockMvc.perform(
@@ -208,7 +223,8 @@ class AuthControllerTest {
         ).andDo(result -> {
             Map<String, String> response = objectMapper.readValue(
                     result.getResponse().getContentAsString(),
-                    new TypeReference<>() {}
+                    new TypeReference<>() {
+                    }
             );
 
             System.out.println(response);
