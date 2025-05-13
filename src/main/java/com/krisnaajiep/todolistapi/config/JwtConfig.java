@@ -30,5 +30,8 @@ public class JwtConfig {
     private String secret;
 
     @Min(1)
-    private long expiration;
+    private long accessTokenExpiration = 3600000;
+
+    @Min(1)
+    private long refreshTokenExpiration = 604800000;
 }
