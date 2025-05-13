@@ -12,6 +12,7 @@
 - [HTTP Response Codes](#http-response-codes)
 - [Project Status](#project-status)
 - [Acknowledgements](#acknowledgements)
+- [License](#license)
 
 ## General Information
 
@@ -411,3 +412,7 @@ Project is: _complete_.
 ## Acknowledgements
 
 This project was inspired by [roadmap.sh](https://roadmap.sh/projects/todo-list-api).
+
+## License
+
+This project is licensed under the MIT License—see the [LICENSE](./LICENSE) file for details.
