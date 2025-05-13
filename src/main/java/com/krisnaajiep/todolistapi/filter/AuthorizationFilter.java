@@ -45,8 +45,9 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             }
 
             String token = authorizationHeader.substring(7);
+            String purpose = jwtUtil.extractPurpose(token);
 
-            if (jwtUtil.isTokenExpired(token)) {
+            if (jwtUtil.isTokenExpired(token) || !purpose.equals("access")) {
                 throw new Exception();
             }
 
