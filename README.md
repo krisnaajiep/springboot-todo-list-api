@@ -68,18 +68,18 @@ How to install:
 3. Import the database
 
    ```bash
-   sqlcmd -S <host> -U <username> -P <password> -No -i "db/TodoListAPI.sql"
+   sqlcmd -S <host> -U <your_database_username> -P <your_database_password> -No -i "db/TodoListAPI.sql"
    ```
 
 4. Set environment variables for databases and JWT secret configuration
 
    ```bash
-   export DB_HOST=<host>
-   export DB_PORT=<port>
+   export DB_HOST=<your_database_host>
+   export DB_PORT=<your_database_port>
    export DB_NAME=TodoListAPI
-   export DB_USERNAME=<username>
-   export DB_PASSWORD=<password>
-   export JWT_SECRET=<jwt_secret>
+   export DB_USERNAME=<your_database_username>
+   export DB_PASSWORD=<your_database_password>
+   export JWT_SECRET=<your_jwt_secret>
    ```
 
 5. Build the project
@@ -91,7 +91,7 @@ How to install:
 6. Copy the JAR file from the `target/` directory
 
    ```bash
-   cp target/todo-list-api-0.0.1-SNAPSHOT.jar todo-list-api.jar 
+   cp target/todo-list-api-1.0.0.jar todo-list-api.jar 
    ```
 
 7. Run the JAR file

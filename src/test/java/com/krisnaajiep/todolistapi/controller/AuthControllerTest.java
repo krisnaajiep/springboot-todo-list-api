@@ -103,7 +103,7 @@ class AuthControllerTest {
     void registerInvalid() throws Exception {
         registerRequestDto = new RegisterRequestDto(
                 "",
-                "john_doe.com",
+                "gggg",
                 "password"
         );
 

@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.krisnaajiep</groupId>
     <artifactId>todo-list-api</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>todo-list-api</name>
     <description>todo-list-api</description>
     <url/>
